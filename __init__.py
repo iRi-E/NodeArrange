@@ -51,7 +51,7 @@ def outputnode_search(mat): #return node/None
 				return node
 	else:
 		for node in mat.node_tree.nodes:
-			if node.type == "OUTPUT" and node.inputs[0].is_linked:
+			if "OUTPUT" in node.type and node.inputs[0].is_linked:
 				return node
 
 	print ("No material output node found")
@@ -65,7 +65,6 @@ def nodes_iterate(mat):
 		return None
 	nodeoutput.label = str(0)
 	#print ("nodeoutput:",nodeoutput)
-
 
 
 	a = []
