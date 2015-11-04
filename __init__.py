@@ -21,6 +21,8 @@ class NodePanel(bpy.types.Panel):
 		row.prop(bpy.context.scene,'nodemargin_x',text="Margin x")
 		row = layout.row()
 		row.prop(bpy.context.scene,'nodemargin_y',text="Margin y")
+		row = layout.row()
+		row.operator('node.button_odd')
 
 class NodeButton(bpy.types.Operator):
 
@@ -34,23 +36,40 @@ class NodeButton(bpy.types.Operator):
 		nodemargin(self,context)
 
 		return {'FINISHED'}
+class NodeButtonOdd(bpy.types.Operator):
 
+	'Show the nodes for this material'
+	bl_idname = 'node.button_odd'
+	bl_label = 'Select odd nodes'
+
+	def execute(self, context):
+
+		mat = bpy.context.object.active_material
+		nodes_iterate(mat, False)
+
+		return {'FINISHED'}
 def nodemargin(self, context):
 
 	values.margin_x = context.scene.nodemargin_x
 	values.margin_y = context.scene.nodemargin_y
 	mat = bpy.context.object.active_material
 	nodes_iterate(mat)
+def nodetree_get(mat):
+
+	if VRAY:
+		return mat.vray.ntree.nodes
+	else:
+		return mat.node_tree.nodes
 
 def outputnode_search(mat): #return node/None
 
-	if VRAY:
-		for node in mat.vray.ntree.nodes:
-			#print (mat.name, node)
+	ntree = nodetree_get(mat)
+
+	for node in ntree:
+		if VRAY:
 			if node.bl_idname == 'VRayNodeOutputMaterial' and node.inputs[0].is_linked:
 				return node
-	else:
-		for node in mat.node_tree.nodes:
+		else:
 			if "OUTPUT" in node.type and node.inputs[0].is_linked:
 				return node
 
@@ -58,7 +77,7 @@ def outputnode_search(mat): #return node/None
 	return None
 
 ###############################################################
-def nodes_iterate(mat):
+def nodes_iterate(mat, arrange = True):
 
 	nodeoutput = outputnode_search(mat)
 	if nodeoutput is None:
@@ -120,6 +139,9 @@ def nodes_iterate(mat):
 	newnodes.reverse()
 	newlevels.reverse()
 
+	if arrange == False:
+		nodes_odd(mat, newnodes)
+		return None
 ########################################
 	level = 0
 	levelmax = max(newlevels) +1
@@ -134,6 +156,18 @@ def nodes_iterate(mat):
 		level = level + 1
 
 	return None
+
+###############################################################
+def nodes_odd(mat, nodelist):
+
+	ntree = nodetree_get(mat)
+	for i in ntree:
+		i.select = False
+
+	a = [x for x in ntree if x not in nodelist]
+	#print ("odd nodes:",a)
+	for i in a:
+		i.select = True
 
 ###############################################################
 class values():
