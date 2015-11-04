@@ -22,7 +22,10 @@ class NodePanel(bpy.types.Panel):
 		row = layout.row()
 		row.prop(bpy.context.scene,'nodemargin_y',text="Margin y")
 		row = layout.row()
+		row.operator('node.button_center')
+		row = layout.row()
 		row.operator('node.button_odd')
+
 
 class NodeButton(bpy.types.Operator):
 
@@ -30,8 +33,7 @@ class NodeButton(bpy.types.Operator):
 	bl_idname = 'node.button'
 	bl_label = 'Arrange nodes'
 
-	def execute(self, context):
-
+	def invoke(self, context, value):
 
 		nodemargin(self,context)
 
@@ -48,6 +50,20 @@ class NodeButtonOdd(bpy.types.Operator):
 		nodes_iterate(mat, False)
 
 		return {'FINISHED'}
+
+class NodeButtonCenter(bpy.types.Operator):
+
+	'Show the nodes for this material'
+	bl_idname = 'node.button_center'
+	bl_label = 'Center nodes (0,0)'
+
+	def execute(self, context):
+
+		mat = bpy.context.object.active_material
+		nodes_center(mat)
+
+		return {'FINISHED'}
+
 def nodemargin(self, context):
 
 	values.margin_x = context.scene.nodemargin_x
@@ -64,13 +80,15 @@ def nodetree_get(mat):
 def outputnode_search(mat): #return node/None
 
 	ntree = nodetree_get(mat)
+	print ("ntree:", ntree[:])
 
 	for node in ntree:
+		print ("node:",node)
 		if VRAY:
 			if node.bl_idname == 'VRayNodeOutputMaterial' and node.inputs[0].is_linked:
 				return node
 		else:
-			if "OUTPUT" in node.type and node.inputs[0].is_linked:
+			if 'OUTPUT' in node.type and node.inputs[0].is_linked:
 				return node
 
 	print ("No material output node found")
@@ -168,13 +186,14 @@ def nodes_odd(mat, nodelist):
 	#print ("odd nodes:",a)
 	for i in a:
 		i.select = True
+margin_y = 20
 
 ###############################################################
 class values():
 	average_y = 0
 	x_last = 0
 	margin_x = 100
-	margin_y = 20
+
 
 def nodes_arrange(nodelist, level):
 
@@ -212,8 +231,49 @@ def nodes_arrange(nodelist, level):
 
 		node.location.y -= values.average_y
 
+def nodes_center(mat):
+
+	ntree = nodetree_get(mat)
+
+	bboxminx = []
+	bboxmaxx = []
+	bboxmaxy = []
+	bboxminy = []
+
+	for node in ntree:
+		bboxminx.append(node.location.x)
+		bboxmaxx.append(node.location.x + node.dimensions.x)
+		bboxmaxy.append(node.location.y)
+		bboxminy.append(node.location.y - node.dimensions.y)
+
+	#print ("bboxminy:",bboxminy)
+	bboxminx = min(bboxminx)
+	bboxmaxx = max(bboxmaxx)
+	bboxminy = min(bboxminy)
+	bboxmaxy = max(bboxmaxy)
+	center_x = (bboxminx + bboxmaxx)/2
+	center_y = (bboxminy + bboxmaxy)/2
+	'''
+	print ("minx:",bboxminx)
+	print ("maxx:",bboxmaxx)
+	print ("miny:",bboxminy)
+	print ("maxy:",bboxmaxy)
+
+	print ("bboxes:", bboxminx, bboxmaxx, bboxmaxy, bboxminy)
+	print ("center x:",center_x)
+	print ("center y:",center_y)
+	'''
+
+	x = 0
+	y = 0
+
+	for node in ntree:
+
+		node.location.x -= center_x
+		node.location.y += -center_y
 
 def register():
+
 	bpy.utils.register_module(__name__)
 	bpy.types.Scene.nodemargin_x = bpy.props.IntProperty(default = 100,update = nodemargin)
 	bpy.types.Scene.nodemargin_y = bpy.props.IntProperty(default = 20,update = nodemargin)
@@ -222,6 +282,8 @@ def unregister():
 	bpy.utils.unregister_module(__name__)
 	del bpy.types.Scene.nodemargin_x
 	del bpy.types.Scene.nodemargin_y
+
+
 if __name__ == "__main__":
 	register()
 
