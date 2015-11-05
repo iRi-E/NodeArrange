@@ -56,6 +56,7 @@ class NodeButtonOdd(bpy.types.Operator):
 
 		return {'FINISHED'}
 
+
 class NodeButtonCenter(bpy.types.Operator):
 
 	'Show the nodes for this material'
@@ -69,6 +70,7 @@ class NodeButtonCenter(bpy.types.Operator):
 
 		return {'FINISHED'}
 
+
 def nodemargin(self, context):
 
 	values.margin_x = context.scene.nodemargin_x
@@ -78,6 +80,7 @@ def nodemargin(self, context):
 	#arrange nodes + this center nodes together
 	if context.scene.node_center:
 		nodes_center(mat)
+
 
 def outputnode_search(mat): #return node/None
 
@@ -252,6 +255,7 @@ def nodetree_get(mat):
 		return mat.vray.ntree.nodes
 	else:
 		return mat.node_tree.nodes
+
 def nodes_center(mat):
 
 	ntree = nodetree_get(mat)
