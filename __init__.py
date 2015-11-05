@@ -11,20 +11,25 @@ class NodePanel(bpy.types.Panel):
 	bl_region_type = "TOOLS"
 	bl_category = "Trees"
 
-
 	def draw(self, context):
 
 		layout = self.layout
 		row = layout.row()
+		col = layout.column
+		#split = layout.split(percentage=.6)
 		row.operator('node.button')
+
 		row = layout.row()
 		row.prop(bpy.context.scene,'nodemargin_x',text="Margin x")
 		row = layout.row()
 		row.prop(bpy.context.scene,'nodemargin_y',text="Margin y")
 		row = layout.row()
+		row.prop(context.scene,'node_center',text = "Center nodes")
+		row = layout.row()
 		row.operator('node.button_center')
 		row = layout.row()
 		row.operator('node.button_odd')
+		row = layout.row()
 
 
 class NodeButton(bpy.types.Operator):
@@ -71,7 +76,8 @@ def nodemargin(self, context):
 	mat = bpy.context.object.active_material
 	nodes_iterate(mat)
 	#arrange nodes + this center nodes together
-	nodes_center(mat)
+	if context.scene.node_center:
+		nodes_center(mat)
 
 def outputnode_search(mat): #return node/None
 
@@ -292,16 +298,16 @@ def nodes_center(mat):
 def register():
 
 	bpy.utils.register_module(__name__)
-	bpy.types.Scene.nodemargin_x = bpy.props.IntProperty(default = 100,update = nodemargin)
-	bpy.types.Scene.nodemargin_y = bpy.props.IntProperty(default = 20,update = nodemargin)
+	bpy.types.Scene.nodemargin_x = bpy.props.IntProperty(default = 100, update = nodemargin)
+	bpy.types.Scene.nodemargin_y = bpy.props.IntProperty(default = 20, update = nodemargin)
+	bpy.types.Scene.node_center = bpy.props.BoolProperty(default = True, update = nodemargin)
 
 def unregister():
 	bpy.utils.unregister_module(__name__)
 	del bpy.types.Scene.nodemargin_x
 	del bpy.types.Scene.nodemargin_y
-
+	del bpy.types.Scene.node_center
 
 if __name__ == "__main__":
 	register()
-
 
