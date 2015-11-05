@@ -70,20 +70,16 @@ def nodemargin(self, context):
 	values.margin_y = context.scene.nodemargin_y
 	mat = bpy.context.object.active_material
 	nodes_iterate(mat)
-def nodetree_get(mat):
-
-	if VRAY:
-		return mat.vray.ntree.nodes
-	else:
-		return mat.node_tree.nodes
+	#arrange nodes + this center nodes together
+	nodes_center(mat)
 
 def outputnode_search(mat): #return node/None
 
 	ntree = nodetree_get(mat)
-	print ("ntree:", ntree[:])
+	#print ("ntree:", ntree[:])
 
 	for node in ntree:
-		print ("node:",node)
+		#print ("node:",node)
 		if VRAY:
 			if node.bl_idname == 'VRayNodeOutputMaterial' and node.inputs[0].is_linked:
 				return node
@@ -133,11 +129,24 @@ def nodes_iterate(mat, arrange = True):
 				nodelist.append(b)
 
 ########################################
+	#delete duplicated nodes at the same level, first wins
+
+	templist = []
+	for item in nodelist:
+		if item not in templist:
+			templist.append(item)
+	'''
+	for item in a:
+		print ("item:", item[1])
+	print()
+	'''
+
+	#delete duplicated nodes
 	newnodes = []
 	newlevels = []
 
-	for i, item in enumerate(reversed(nodelist)):
-
+	for i, item in enumerate(reversed(templist)):
+		#print ("nodelist reversed:", item)
 		#node label back to default
 		item[0].label = ""
 		if item[0] not in newnodes:
@@ -231,6 +240,12 @@ def nodes_arrange(nodelist, level):
 
 		node.location.y -= values.average_y
 
+def nodetree_get(mat):
+
+	if VRAY:
+		return mat.vray.ntree.nodes
+	else:
+		return mat.node_tree.nodes
 def nodes_center(mat):
 
 	ntree = nodetree_get(mat)
@@ -241,10 +256,11 @@ def nodes_center(mat):
 	bboxminy = []
 
 	for node in ntree:
-		bboxminx.append(node.location.x)
-		bboxmaxx.append(node.location.x + node.dimensions.x)
-		bboxmaxy.append(node.location.y)
-		bboxminy.append(node.location.y - node.dimensions.y)
+		if node.parent == None:
+			bboxminx.append(node.location.x)
+			bboxmaxx.append(node.location.x + node.dimensions.x)
+			bboxmaxy.append(node.location.y)
+			bboxminy.append(node.location.y - node.dimensions.y)
 
 	#print ("bboxminy:",bboxminy)
 	bboxminx = min(bboxminx)
@@ -269,8 +285,9 @@ def nodes_center(mat):
 
 	for node in ntree:
 
-		node.location.x -= center_x
-		node.location.y += -center_y
+		if node.parent == None:
+			node.location.x -= center_x
+			node.location.y += -center_y
 
 def register():
 
