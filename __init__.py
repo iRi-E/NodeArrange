@@ -47,7 +47,10 @@ class NodeButton(bpy.types.Operator):
     bl_idname = 'node.button'
     bl_label = 'Arrange nodes'
 
+    # not sure this is doing what you expect.
+    # blender.org/api/blender_python_api_current/bpy.types.Operator.html#invoke
     def invoke(self, context, value):
+        values.mat_name = ""  # reset
         nodemargin(self, context)
         return {'FINISHED'}
 
@@ -59,10 +62,9 @@ class NodeButtonOdd(bpy.types.Operator):
     bl_label = 'Select odd nodes'
 
     def execute(self, context):
-
+        values.mat_name = ""  # reset
         mat = bpy.context.object.active_material
         nodes_iterate(mat, False)
-
         return {'FINISHED'}
 
 
@@ -73,10 +75,9 @@ class NodeButtonCenter(bpy.types.Operator):
     bl_label = 'Center nodes (0,0)'
 
     def execute(self, context):
-
+        values.mat_name = ""  # reset
         mat = bpy.context.object.active_material
         nodes_center(mat)
-
         return {'FINISHED'}
 
 
@@ -224,24 +225,25 @@ def nodes_iterate(mat, arrange=True):
     newnodes.reverse()
     newlevels.reverse()
 
-    if (arrange == False):
+    if not arrange:
         nodes_odd(mat, newnodes)
         return None
 
     ########################################
     level = 0
-    levelmax = max(newlevels) +1
+    levelmax = max(newlevels) + 1
     values.x_last = 0
 
     while level < levelmax:
 
         values.average_y = 0
-        nodes = [x for i,x in enumerate(newnodes) if newlevels[i] == level]
+        nodes = [x for i, x in enumerate(newnodes) if newlevels[i] == level]
         nodes_arrange(nodes, level)
-        #print ("level:", level, nodes)
+        # print ("level:", level, nodes)
         level = level + 1
 
     return None
+
 
 ###############################################################
 def nodes_odd(mat, nodelist):
@@ -251,23 +253,21 @@ def nodes_odd(mat, nodelist):
         i.select = False
 
     a = [x for x in ntree if x not in nodelist]
-    #print ("odd nodes:",a)
+    # print ("odd nodes:",a)
     for i in a:
         i.select = True
 
 
-
 def nodes_arrange(nodelist, level):
 
-
-    #node x positions
+    # node x positions
 
     widthmax = max([x.dimensions.x for x in nodelist])
-    xpos = values.x_last - (widthmax + values.margin_x) if level !=0 else 0
-    #print ("nodelist, xpos", nodelist,xpos)
+    xpos = values.x_last - (widthmax + values.margin_x) if level != 0 else 0
+    # print ("nodelist, xpos", nodelist,xpos)
     values.x_last = xpos
 
-    #node y positions
+    # node y positions
     x = 0
     y = 0
 
@@ -275,7 +275,7 @@ def nodes_arrange(nodelist, level):
 
         if node.hide:
             hidey = (node.dimensions.y / 2) - 8
-            y = y -  hidey
+            y = y - hidey
         else:
             hidey = 0
 
@@ -286,12 +286,13 @@ def nodes_arrange(nodelist, level):
 
     y = y + values.margin_y
 
-    center = (0 + y) /2
+    center = (0 + y) / 2
     values.average_y = center - values.average_y
 
     for node in nodelist:
 
         node.location.y -= values.average_y
+
 
 def nodetree_get(mat):
 
@@ -299,6 +300,7 @@ def nodetree_get(mat):
         return mat.vray.ntree.nodes
     else:
         return mat.node_tree.nodes
+
 
 def nodes_center(mat):
 
@@ -310,19 +312,19 @@ def nodes_center(mat):
     bboxminy = []
 
     for node in ntree:
-        if node.parent == None:
+        if not node.parent:
             bboxminx.append(node.location.x)
             bboxmaxx.append(node.location.x + node.dimensions.x)
             bboxmaxy.append(node.location.y)
             bboxminy.append(node.location.y - node.dimensions.y)
 
-    #print ("bboxminy:",bboxminy)
+    # print ("bboxminy:",bboxminy)
     bboxminx = min(bboxminx)
     bboxmaxx = max(bboxmaxx)
     bboxminy = min(bboxminy)
     bboxmaxy = max(bboxmaxy)
-    center_x = (bboxminx + bboxmaxx)/2
-    center_y = (bboxminy + bboxmaxy)/2
+    center_x = (bboxminx + bboxmaxx) / 2
+    center_y = (bboxminy + bboxmaxy) / 2
     '''
     print ("minx:",bboxminx)
     print ("maxx:",bboxmaxx)
@@ -339,16 +341,17 @@ def nodes_center(mat):
 
     for node in ntree:
 
-        if node.parent == None:
+        if not node.parent:
             node.location.x -= center_x
             node.location.y += -center_y
 
-def register():
 
-    bpy.types.Scene.nodemargin_x = bpy.props.IntProperty(default = 100, update = nodemargin)
-    bpy.types.Scene.nodemargin_y = bpy.props.IntProperty(default = 20, update = nodemargin)
-    bpy.types.Scene.node_center = bpy.props.BoolProperty(default = True, update = nodemargin)
+def register():
+    bpy.types.Scene.nodemargin_x = bpy.props.IntProperty(default=100, update=nodemargin)
+    bpy.types.Scene.nodemargin_y = bpy.props.IntProperty(default=20, update=nodemargin)
+    bpy.types.Scene.node_center = bpy.props.BoolProperty(default=True, update=nodemargin)
     bpy.utils.register_module(__name__)
+
 
 def unregister():
     bpy.utils.unregister_module(__name__)
@@ -358,4 +361,3 @@ def unregister():
 
 if __name__ == "__main__":
     register()
-
