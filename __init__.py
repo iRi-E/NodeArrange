@@ -2,7 +2,7 @@
 import sys
 import bpy
 
-CYCLES = False
+CYCLES = True
 VRAY = not CYCLES
 
 
@@ -47,18 +47,10 @@ class NodeButton(bpy.types.Operator):
     bl_idname = 'node.button'
     bl_label = 'Arrange nodes'
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
     # not sure this is doing what you expect.
     # blender.org/api/blender_python_api_current/bpy.types.Operator.html#invoke
     def invoke(self, context, value):
         values.mat_name = ""  # reset
-=======
-    def invoke(self, context, value):
->>>>>>> Stashed changes
-=======
-    def invoke(self, context, value):
->>>>>>> Stashed changes
         nodemargin(self, context)
         return {'FINISHED'}
 
@@ -68,33 +60,15 @@ class NodeButtonOdd(bpy.types.Operator):
     'Show the nodes for this material'
     bl_idname = 'node.button_odd'
     bl_label = 'Select odd nodes'
-<<<<<<< Updated upstream
 
     def execute(self, context):
-<<<<<<< Updated upstream
         values.mat_name = ""  # reset
         mat = bpy.context.object.active_material
         nodes_iterate(mat, False)
-=======
-
-    def execute(self, context):
-
-        mat = bpy.context.object.active_material
-        nodes_iterate(mat, False)
-
->>>>>>> Stashed changes
         return {'FINISHED'}
 
 
 class NodeButtonCenter(bpy.types.Operator):
-=======
-
-<<<<<<< Updated upstream
-        mat = bpy.context.object.active_material
-        nodes_iterate(mat, False)
-
-        return {'FINISHED'}
->>>>>>> Stashed changes
 
     'Show the nodes for this material'
     bl_idname = 'node.button_center'
@@ -104,20 +78,8 @@ class NodeButtonCenter(bpy.types.Operator):
         values.mat_name = ""  # reset
         mat = bpy.context.object.active_material
         nodes_center(mat)
-=======
-    'Show the nodes for this material'
-    bl_idname = 'node.button_center'
-    bl_label = 'Center nodes (0,0)'
-
-    def execute(self, context):
-
-        mat = bpy.context.object.active_material
-        nodes_center(mat)
-
->>>>>>> Stashed changes
         return {'FINISHED'}
 
-<<<<<<< Updated upstream
 
 def nodemargin(self, context):
 
@@ -125,21 +87,6 @@ def nodemargin(self, context):
     values.margin_y = context.scene.nodemargin_y
 
     mat = bpy.context.object.active_material  # set first, pessimistic.
-<<<<<<< Updated upstream
-=======
-    'Show the nodes for this material'
-    bl_idname = 'node.button_center'
-    bl_label = 'Center nodes (0,0)'
-
-    def execute(self, context):
-
-        mat = bpy.context.object.active_material
-        nodes_center(mat)
-
-        return {'FINISHED'}
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 
     # LOL. kill me.
     if not mat:
@@ -153,7 +100,6 @@ def nodemargin(self, context):
     if context.scene.node_center:
         nodes_center(mat)
 
-<<<<<<< Updated upstream
 
 class ArrangeNodesOp(bpy.types.Operator):
     bl_idname = 'node.arrange_nodetree'
@@ -185,7 +131,6 @@ class ArrangeNodesOp(bpy.types.Operator):
         self.nodemargin2(context)
         return {'FINISHED'}
 
-<<<<<<< Updated upstream
 
 def outputnode_search(mat):  # return node/None
 
@@ -201,92 +146,6 @@ def outputnode_search(mat):  # return node/None
             if 'OUTPUT' in node.type and node.inputs[0].is_linked:
                 return node
 
-=======
-    values.margin_x = context.scene.nodemargin_x
-    values.margin_y = context.scene.nodemargin_y
-
-    mat = bpy.context.object.active_material  # set first, pessimistic.
-
-    # LOL. kill me.
-    if not mat:
-        possible_mat = bpy.data.materials.get(values.mat_name)
-        if possible_mat:
-            mat = possible_mat
-
-    nodes_iterate(mat)
-
-    # arrange nodes + this center nodes together
-    if context.scene.node_center:
-        nodes_center(mat)
-
-
-class ArrangeNodesOp(bpy.types.Operator):
-    bl_idname = 'node.arrange_nodetree'
-    bl_label = 'Nodes Private Op'
-
-    mat_name = bpy.props.StringProperty()
-    margin_x = bpy.props.IntProperty(default=120)
-    margin_y = bpy.props.IntProperty(default=120)
-
-    def nodemargin2(self, context):
-        mat = None
-        mat_found = bpy.data.materials.get(self.mat_name)
-        if self.mat_name and mat_found:
-            mat = mat_found
-            print(mat)
-
-=======
-
-class ArrangeNodesOp(bpy.types.Operator):
-    bl_idname = 'node.arrange_nodetree'
-    bl_label = 'Nodes Private Op'
-
-    mat_name = bpy.props.StringProperty()
-    margin_x = bpy.props.IntProperty(default=120)
-    margin_y = bpy.props.IntProperty(default=120)
-
-    def nodemargin2(self, context):
-        mat = None
-        mat_found = bpy.data.materials.get(self.mat_name)
-        if self.mat_name and mat_found:
-            mat = mat_found
-            print(mat)
-
->>>>>>> Stashed changes
-        if not mat:
-            return
-        else:
-            values.mat_name = self.mat_name
-            scn = context.scene
-            scn.nodemargin_x = self.margin_x
-            scn.nodemargin_y = self.margin_y
-            nodes_iterate(mat)
-            if scn.node_center:
-                nodes_center(mat)
-
-    def execute(self, context):
-        self.nodemargin2(context)
-        return {'FINISHED'}
-
-
-def outputnode_search(mat):  # return node/None
-
-    ntree = nodetree_get(mat)
-    # print ("ntree:", ntree[:])
-
-    for node in ntree:
-        # print ("node:",node)
-        if VRAY:
-            if node.bl_idname == 'VRayNodeOutputMaterial' and node.inputs[0].is_linked:
-                return node
-        else:
-            if 'OUTPUT' in node.type and node.inputs[0].is_linked:
-                return node
-
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
     print("No material output node found")
     return None
 
@@ -366,36 +225,18 @@ def nodes_iterate(mat, arrange=True):
     newnodes.reverse()
     newlevels.reverse()
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
     if not arrange:
-=======
-    if (arrange == False):
->>>>>>> Stashed changes
-=======
-    if (arrange == False):
->>>>>>> Stashed changes
         nodes_odd(mat, newnodes)
         return None
 
     ########################################
     level = 0
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
     levelmax = max(newlevels) + 1
-=======
-    levelmax = max(newlevels) +1
->>>>>>> Stashed changes
-=======
-    levelmax = max(newlevels) +1
->>>>>>> Stashed changes
     values.x_last = 0
 
     while level < levelmax:
 
         values.average_y = 0
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
         nodes = [x for i, x in enumerate(newnodes) if newlevels[i] == level]
         nodes_arrange(nodes, level)
         # print ("level:", level, nodes)
@@ -403,19 +244,6 @@ def nodes_iterate(mat, arrange=True):
 
     return None
 
-=======
-=======
->>>>>>> Stashed changes
-        nodes = [x for i,x in enumerate(newnodes) if newlevels[i] == level]
-        nodes_arrange(nodes, level)
-        #print ("level:", level, nodes)
-        level = level + 1
-
-    return None
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 
 ###############################################################
 def nodes_odd(mat, nodelist):
@@ -423,36 +251,17 @@ def nodes_odd(mat, nodelist):
     ntree = nodetree_get(mat)
     for i in ntree:
         i.select = False
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
 
     a = [x for x in ntree if x not in nodelist]
     # print ("odd nodes:",a)
     for i in a:
         i.select = True
-=======
-
-    a = [x for x in ntree if x not in nodelist]
-    #print ("odd nodes:",a)
-    for i in a:
-        i.select = True
-
->>>>>>> Stashed changes
-=======
-
-    a = [x for x in ntree if x not in nodelist]
-    #print ("odd nodes:",a)
-    for i in a:
-        i.select = True
-
->>>>>>> Stashed changes
 
 
 def nodes_arrange(nodelist, level):
 
     # node x positions
 
-<<<<<<< Updated upstream
     widthmax = max([x.dimensions.x for x in nodelist])
     xpos = values.x_last - (widthmax + values.margin_x) if level != 0 else 0
     # print ("nodelist, xpos", nodelist,xpos)
@@ -464,7 +273,6 @@ def nodes_arrange(nodelist, level):
 
     for node in nodelist:
 
-<<<<<<< Updated upstream
         if node.hide:
             hidey = (node.dimensions.y / 2) - 8
             y = y - hidey
@@ -485,74 +293,6 @@ def nodes_arrange(nodelist, level):
 
         node.location.y -= values.average_y
 
-=======
-    #node x positions
-
-    widthmax = max([x.dimensions.x for x in nodelist])
-    xpos = values.x_last - (widthmax + values.margin_x) if level !=0 else 0
-    #print ("nodelist, xpos", nodelist,xpos)
-    values.x_last = xpos
-
-    #node y positions
-    x = 0
-    y = 0
-
-    for node in nodelist:
-
-        if node.hide:
-            hidey = (node.dimensions.y / 2) - 8
-            y = y -  hidey
-        else:
-            hidey = 0
-
-        node.location.y = y
-        y = y - values.margin_y - node.dimensions.y + hidey
-
-        node.location.x = xpos
-
-    y = y + values.margin_y
-
-    center = (0 + y) /2
-    values.average_y = center - values.average_y
-
-    for node in nodelist:
-
-        node.location.y -= values.average_y
->>>>>>> Stashed changes
-=======
-    #node x positions
-
-    widthmax = max([x.dimensions.x for x in nodelist])
-    xpos = values.x_last - (widthmax + values.margin_x) if level !=0 else 0
-    #print ("nodelist, xpos", nodelist,xpos)
-    values.x_last = xpos
-
-    #node y positions
-    x = 0
-    y = 0
-
-    for node in nodelist:
-
-        if node.hide:
-            hidey = (node.dimensions.y / 2) - 8
-            y = y -  hidey
-        else:
-            hidey = 0
-
-        node.location.y = y
-        y = y - values.margin_y - node.dimensions.y + hidey
-
-        node.location.x = xpos
-
-    y = y + values.margin_y
-
-    center = (0 + y) /2
-    values.average_y = center - values.average_y
-
-    for node in nodelist:
-
-        node.location.y -= values.average_y
->>>>>>> Stashed changes
 
 def nodetree_get(mat):
 
@@ -560,13 +300,7 @@ def nodetree_get(mat):
         return mat.vray.ntree.nodes
     else:
         return mat.node_tree.nodes
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
 
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 
 def nodes_center(mat):
 
@@ -578,45 +312,19 @@ def nodes_center(mat):
     bboxminy = []
 
     for node in ntree:
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
         if not node.parent:
-=======
-        if node.parent == None:
->>>>>>> Stashed changes
-=======
-        if node.parent == None:
->>>>>>> Stashed changes
             bboxminx.append(node.location.x)
             bboxmaxx.append(node.location.x + node.dimensions.x)
             bboxmaxy.append(node.location.y)
             bboxminy.append(node.location.y - node.dimensions.y)
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
     # print ("bboxminy:",bboxminy)
-=======
-    #print ("bboxminy:",bboxminy)
->>>>>>> Stashed changes
-=======
-    #print ("bboxminy:",bboxminy)
->>>>>>> Stashed changes
     bboxminx = min(bboxminx)
     bboxmaxx = max(bboxmaxx)
     bboxminy = min(bboxminy)
     bboxmaxy = max(bboxmaxy)
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
     center_x = (bboxminx + bboxmaxx) / 2
     center_y = (bboxminy + bboxmaxy) / 2
-=======
-    center_x = (bboxminx + bboxmaxx)/2
-    center_y = (bboxminy + bboxmaxy)/2
->>>>>>> Stashed changes
-=======
-    center_x = (bboxminx + bboxmaxx)/2
-    center_y = (bboxminy + bboxmaxy)/2
->>>>>>> Stashed changes
     '''
     print ("minx:",bboxminx)
     print ("maxx:",bboxmaxx)
@@ -633,17 +341,10 @@ def nodes_center(mat):
 
     for node in ntree:
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
         if not node.parent:
             node.location.x -= center_x
             node.location.y += -center_y
 
-=======
-        if node.parent == None:
-            node.location.x -= center_x
-            node.location.y += -center_y
->>>>>>> Stashed changes
 
 def register():
     bpy.types.Scene.nodemargin_x = bpy.props.IntProperty(default=100, update=nodemargin)
@@ -651,24 +352,6 @@ def register():
     bpy.types.Scene.node_center = bpy.props.BoolProperty(default=True, update=nodemargin)
     bpy.utils.register_module(__name__)
 
-<<<<<<< Updated upstream
-=======
-=======
-        if node.parent == None:
-            node.location.x -= center_x
-            node.location.y += -center_y
-
-def register():
-
->>>>>>> Stashed changes
-    bpy.types.Scene.nodemargin_x = bpy.props.IntProperty(default = 100, update = nodemargin)
-    bpy.types.Scene.nodemargin_y = bpy.props.IntProperty(default = 20, update = nodemargin)
-    bpy.types.Scene.node_center = bpy.props.BoolProperty(default = True, update = nodemargin)
-    bpy.utils.register_module(__name__)
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 
 def unregister():
     bpy.utils.unregister_module(__name__)
@@ -678,10 +361,3 @@ def unregister():
 
 if __name__ == "__main__":
     register()
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
-=======
->>>>>>> Stashed changes
-
->>>>>>> Stashed changes
