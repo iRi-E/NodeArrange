@@ -1,3 +1,6 @@
+#Lisence is FFA, Free For All
+#you can do everything with code, sell, loan, rent, publish it, not publish it, change your lisence 
+
 
 import sys
 import bpy
