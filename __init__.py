@@ -1,5 +1,5 @@
 #Lisence is FFA, Free For All
-#you can do everything with code, sell, loan, rent, publish it, not publish it, change your lisence 
+#you can do everything with the code, sell, loan, rent, publish it, not publish it, change your license 
 
 
 import sys
