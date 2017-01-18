@@ -55,7 +55,7 @@ class NodePanel(bpy.types.Panel):
 
 class NodeButton(bpy.types.Operator):
 
-    'Show the nodes for this material'
+    'Rearrange whole of current node tree'
     bl_idname = 'node.button'
     bl_label = 'Arrange nodes'
 
@@ -68,7 +68,7 @@ class NodeButton(bpy.types.Operator):
 
 class NodeButtonOdd(bpy.types.Operator):
 
-    'Show the nodes for this material'
+    'Select nodes that have no output or don\'t link to Output node'
     bl_idname = 'node.button_odd'
     bl_label = 'Select odd nodes'
 
@@ -79,7 +79,7 @@ class NodeButtonOdd(bpy.types.Operator):
 
 class NodeButtonCenter(bpy.types.Operator):
 
-    'Show the nodes for this material'
+    'Move node tree to the origin'
     bl_idname = 'node.button_center'
     bl_label = 'Center nodes (0,0)'
 
