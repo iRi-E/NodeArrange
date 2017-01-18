@@ -62,7 +62,6 @@ class NodeButton(bpy.types.Operator):
     # not sure this is doing what you expect.
     # blender.org/api/blender_python_api_current/bpy.types.Operator.html#invoke
     def invoke(self, context, value):
-        values.mat_name = ""  # reset
         nodemargin(self, context)
         return {'FINISHED'}
 
@@ -74,9 +73,7 @@ class NodeButtonOdd(bpy.types.Operator):
     bl_label = 'Select odd nodes'
 
     def execute(self, context):
-        values.mat_name = ""  # reset
-        mat = bpy.context.object.active_material
-        nodes_iterate(mat, False)
+        nodes_iterate(context.space_data.edit_tree.nodes, False)
         return {'FINISHED'}
 
 
@@ -87,67 +84,24 @@ class NodeButtonCenter(bpy.types.Operator):
     bl_label = 'Center nodes (0,0)'
 
     def execute(self, context):
-        values.mat_name = ""  # reset
-        mat = bpy.context.object.active_material
-        nodes_center(mat)
+        nodes_center(context.space_data.edit_tree.nodes)
         return {'FINISHED'}
 
 
 def nodemargin(self, context):
 
+    ntree = context.space_data.edit_tree.nodes
     values.margin_x = context.scene.nodemargin_x
     values.margin_y = context.scene.nodemargin_y
 
-    mat = bpy.context.object.active_material  # set first, pessimistic.
-
-    # LOL. kill me.
-    if not mat:
-        possible_mat = bpy.data.materials.get(values.mat_name)
-        if possible_mat:
-            mat = possible_mat
-
-    nodes_iterate(mat)
+    nodes_iterate(ntree)
 
     # arrange nodes + this center nodes together
     if context.scene.node_center:
-        nodes_center(mat)
+        nodes_center(ntree)
 
 
-class ArrangeNodesOp(bpy.types.Operator):
-    bl_idname = 'node.arrange_nodetree'
-    bl_label = 'Nodes Private Op'
-
-    mat_name = bpy.props.StringProperty()
-    margin_x = bpy.props.IntProperty(default=120)
-    margin_y = bpy.props.IntProperty(default=120)
-
-    def nodemargin2(self, context):
-        mat = None
-        mat_found = bpy.data.materials.get(self.mat_name)
-        if self.mat_name and mat_found:
-            mat = mat_found
-            print(mat)
-
-        if not mat:
-            return
-        else:
-            values.mat_name = self.mat_name
-            scn = context.scene
-            scn.nodemargin_x = self.margin_x
-            scn.nodemargin_y = self.margin_y
-            nodes_iterate(mat)
-            if scn.node_center:
-                nodes_center(mat)
-
-    def execute(self, context):
-        self.nodemargin2(context)
-        return {'FINISHED'}
-
-
-def outputnode_search(mat):  # return node/None
-
-    ntree = nodetree_get(mat)
-    # print ("ntree:", ntree[:])
+def outputnode_search(ntree):  # return node/None
 
     for node in ntree:
         # print ("node:",node)
@@ -155,17 +109,17 @@ def outputnode_search(mat):  # return node/None
             if node.bl_idname == 'VRayNodeOutputMaterial' and node.inputs[0].is_linked:
                 return node
         else:
-            if 'OUTPUT' in node.type and node.inputs[0].is_linked:
+            if node.type in ['OUTPUT', 'GROUP_OUTPUT', 'COMPOSITE'] and node.inputs[0].is_linked:
                 return node
 
-    print("No material output node found")
+    print("No output node found")
     return None
 
 
 ###############################################################
-def nodes_iterate(mat, arrange=True):
+def nodes_iterate(ntree, arrange=True):
 
-    nodeoutput = outputnode_search(mat)
+    nodeoutput = outputnode_search(ntree)
     if nodeoutput is None:
         return None
     nodeoutput.label = str(0)
@@ -238,7 +192,7 @@ def nodes_iterate(mat, arrange=True):
     newlevels.reverse()
 
     if not arrange:
-        nodes_odd(mat, newnodes)
+        nodes_odd(ntree, newnodes)
         return None
 
     ########################################
@@ -258,9 +212,8 @@ def nodes_iterate(mat, arrange=True):
 
 
 ###############################################################
-def nodes_odd(mat, nodelist):
+def nodes_odd(ntree, nodelist):
 
-    ntree = nodetree_get(mat)
     for i in ntree:
         i.select = False
 
@@ -306,17 +259,7 @@ def nodes_arrange(nodelist, level):
         node.location.y -= values.average_y
 
 
-def nodetree_get(mat):
-
-    if VRAY:
-        return mat.vray.ntree.nodes
-    else:
-        return mat.node_tree.nodes
-
-
-def nodes_center(mat):
-
-    ntree = nodetree_get(mat)
+def nodes_center(ntree):
 
     bboxminx = []
     bboxmaxx = []
