@@ -1,6 +1,15 @@
 #Lisence is FFA, Free For All
 #you can do everything with the code, sell, loan, rent, publish it, not publish it, change your license 
 
+bl_info = {
+    "name": "Node Arrange",
+    "author": "TynkaTopi (JuhaW)",
+    "version": (0, 1, 0),
+    "blender": (2, 78, 0),
+    "location": "Node Editor > Properties > Trees",
+    "description": "Node Tree Arrangement Tools",
+    "tracker_url": "https://github.com/JuhaW/NodeArrange/issues",
+    "category": "Node Editor"}
 
 import sys
 import bpy
